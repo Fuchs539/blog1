@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexus Musik & Blog</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(to bottom, #2d1b4e, #1e3a8a);
+      color: #ffffff;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      color: #00f2ff;
+      text-shadow: 0 0 10px #00f2ff;
+    }
+
+    .header .controls {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .header input, .header select {
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      background: #1f2937;
+      color: #ffffff;
+      font-size: 1rem;
+    }
+
+    .header input:focus, .header select:focus {
+      outline: none;
+      box-shadow: 0 0 5px #00f2ff;
+    }
+
+    .header .upload-btn, .header .notification {
+      padding: 10px;
+      background: #00f2ff;
+      color: #1f2937;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .header .upload-btn:hover, .header .notification:hover {
+      background: #6b46c1;
+    }
+
+    .notification {
+      position: relative;
+    }
+
+    .notification .badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: #ef4444;
+      color: #ffffff;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+    }
+
+    .notification-dropdown {
+      position: absolute;
+      top: 40px;
+      right: 0;
+      background: #1f2937;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      width: 300px;
+      max-height: 300px;
+      overflow-y: auto;
+      display: none;
+      z-index: 10;
+    }
+
+    .notification-dropdown.active {
+      display: block;
+    }
+
+    .notification-dropdown p {
+      padding: 10px;
+      font-size: 0.875rem;
+      color: #d1d5db;
+      border-bottom: 1px solid #374151;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .notification-dropdown p:hover {
+      background: #374151;
+    }
+
+    .notification-dropdown p:last-child {
+      border-bottom: none;
+    }
+
+    .channel-info {
+      background: #1f2937;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 40px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .channel-info h2 {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+    }
+
+    .channel-info p {
+      font-size: 1rem;
+      color: #d1d5db;
+      margin-bottom: 5px;
+    }
+
+    .channel-info .subscribe-btn, .channel-info .unsubscribe-btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-block;
+      margin-top: 10px;
+      margin-right: 10px;
+      transition: background 0.3s;
+    }
+
+    .channel-info .subscribe-btn {
+      background: #00f2ff;
+      color: #1f2937;
+    }
+
+    .channel-info .unsubscribe-btn {
+      background: #ef4444;
+      color: #ffffff;
+    }
+
+    .channel-info .subscribe-btn:hover {
+      background: #6b46c1;
+    }
+
+    .channel-info .unsubscribe-btn:hover {
+      background: #dc2626;
+    }
+
+    .channel-info .subscribe-btn:disabled, .channel-info .unsubscribe-btn:disabled {
+      background: #4b5563;
+      cursor: not-allowed;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    .tabs button {
+      padding: 10px 20px;
+      background: #1f2937;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .tabs button.active, .tabs button:hover {
+      background: #00f2ff;
+      color: #1f2937;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .content-card {
+      background: #1f2937;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      transition: transform 0.3s;
+    }
+
+    .content-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .content-card h3 {
+      font-size: 1.25rem;
+      margin-bottom: 10px;
+    }
+
+    .content-card .meta {
+      font-size: 0.875rem;
+      color: #d1d5db;
+      margin-bottom: 10px;
+    }
+
+    .content-card audio {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
+    .content-card .post-text {
+      font-size: 1rem;
+      color: #d1d5db;
+      line-height: 1.6;
+      max-height: 300px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+
+    .content-card .actions {
+      display: flex;
+      gap: 15px;
+      margin-top: 10px;
+    }
+
+    .content-card .action-btn {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: #00f2ff;
+      background: none;
+      border: none;
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+
+    .content-card .action-btn:disabled {
+      color: #4b5563;
+      cursor: not-allowed;
+    }
+
+    .content-card .action-btn:hover:not(:disabled) {
+      color: #6b46c1;
+    }
+
+    .content-card .delete-btn {
+      padding: 5px 10px;
+      background: #ef4444;
+      color: #ffffff;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+      margin-top: 10px;
+    }
+
+    .content-card .delete-btn:hover {
+      background: #dc2626;
+    }
+
+    .content-card .comments {
+      margin-top: 10px;
+      display: none;
+    }
+
+    .content-card .comments.active {
+      display: block;
+    }
+
+    .content-card .comments p {
+      font-size: 0.875rem;
+      color: #d1d5db;
+      margin-bottom: 5px;
+    }
+
+    .content-card .comment-toggle {
+      padding: 5px 10px;
+      background: #00f2ff;
+      color: #1f2937;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+      margin-top: 10px;
+    }
+
+    .content-card .comment-toggle:hover {
+      background: #6b46c1;
+    }
+
+    .content-card input {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      background: #374151;
+      color: #ffffff;
+      font-size: 0.875rem;
+      margin-top: 10px;
+    }
+
+    .content-card input:focus {
+      outline: none;
+      box-shadow: 0 0 5px #00f2ff;
+    }
+
+    .upload-modal, .delete-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .upload-modal.active, .delete-modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: #1f2937;
+      border-radius: 12px;
+      padding: 20px;
+      max-width: 500px;
+      width: 100%;
+    }
+
+    .modal-content h2 {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+    }
+
+    .modal-content select,
+    .modal-content input,
+    .modal-content textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 20px;
+      border: none;
+      border-radius: 8px;
+      background: #374151;
+      color: #ffffff;
+      font-size: 1rem;
+    }
+
+    .modal-content textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .modal-content select:focus,
+    .modal-content input:focus,
+    .modal-content textarea:focus {
+      outline: none;
+      box-shadow: 0 0 5px #00f2ff;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .modal-actions button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .modal-actions .cancel-btn {
+      background: #4b5563;
+      color: #ffffff;
+    }
+
+    .modal-actions .save-btn, .modal-actions .delete-confirm-btn {
+      background: #00f2ff;
+      color: #1f2937;
+    }
+
+    .modal-actions .cancel-btn:hover {
+      background: #6b7280;
+    }
+
+    .modal-actions .save-btn:hover, .modal-actions .delete-confirm-btn:hover {
+      background: #6b46c1;
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+      }
+
+      .header h1 {
+        font-size: 2rem;
+      }
+
+      .header .controls {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .tabs {
+        flex-direction: column;
+      }
+
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .notification-dropdown {
+        width: 100%;
+        right: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Nexus Musik & Blog</h1>
+      <div class="controls">
+        <input type="text" id="search" placeholder="Search...">
+        <select id="filter">
+          <option value="all">All</option>
+          <option value="music">Music</option>
+          <option value="post">Posts</option>
+        </select>
+        <button class="upload-btn material-icons" onclick="openModal()">cloud_upload</button>
+        <div class="notification" onclick="toggleNotifications()">
+          <span class="material-icons">notifications</span>
+          <span class="badge" id="notification-count">0</span>
+          <div class="notification-dropdown" id="notification-dropdown"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="channel-info">
+      <h2>Nexus</h2>
+      <p>Subscribers: <span id="subscribers">0</span></p>
+      <p>Total Views: <span id="total-views">0</span></p>
+      <p>Monthly Views: <span id="monthly-views">0</span></p>
+      <button class="subscribe-btn" id="subscribe-btn" onclick="subscribe()">Subscribe</button>
+      <button class="unsubscribe-btn" id="unsubscribe-btn" onclick="unsubscribe()" disabled>Unsubscribe</button>
+    </div>
+
+    <div class="tabs">
+      <button class="active" onclick="switchTab('music')">Music</button>
+      <button onclick="switchTab('post')">Posts</button>
+    </div>
+
+    <div class="content-grid" id="content-grid"></div>
+
+    <div class="upload-modal" id="upload-modal">
+      <div class="modal-content">
+        <h2>Upload Content</h2>
+        <select id="upload-type">
+          <option value="music">Music</option>
+          <option value="post">Post</option>
+        </select>
+        <input type="text" id="upload-title" placeholder="Title">
+        <input type="file" id="upload-file" accept=".mp3,.wav">
+        <textarea id="upload-text" placeholder="Your post content..."></textarea>
+        <input type="text" id="upload-code" placeholder="Enter secure code">
+        <div class="modal-actions">
+          <button class="cancel-btn" onclick="closeModal()">Cancel</button>
+          <button class="save-btn" onclick="handleUpload()">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="delete-modal" id="delete-modal">
+      <div class="modal-content">
+        <h2>Delete Content</h2>
+        <p>Enter the secure code to delete this content.</p>
+        <input type="text" id="delete-code" placeholder="Enter secure code">
+        <div class="modal-actions">
+          <button class="cancel-btn" onclick="closeDeleteModal()">Cancel</button>
+          <button class="delete-confirm-btn" onclick="confirmDelete()">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let uploads = JSON.parse(localStorage.getItem('uploads')) || [];
+    let activeTab = 'music';
+    let subscribers = parseInt(localStorage.getItem('subscribers')) || 0;
+    let totalViews = parseInt(localStorage.getItem('totalViews')) || 0;
+    let monthlyViews = parseInt(localStorage.getItem('monthlyViews')) || 0;
+    let notifications = JSON.parse(localStorage.getItem('notifications')) || [];
+    let likedItems = JSON.parse(localStorage.getItem('likedItems')) || [];
+    let hasSubscribed = localStorage.getItem('hasSubscribed') === 'true';
+    const correctCode = 'ShimaKing';
+    let deletePostId = null;
+
+    function saveData() {
+      localStorage.setItem('uploads', JSON.stringify(uploads));
+      localStorage.setItem('subscribers', subscribers);
+      localStorage.setItem('totalViews', totalViews);
+      localStorage.setItem('monthlyViews', monthlyViews);
+      localStorage.setItem('notifications', JSON.stringify(notifications));
+      localStorage.setItem('likedItems', JSON.stringify(likedItems));
+      localStorage.setItem('hasSubscribed', hasSubscribed);
+    }
+
+    function renderContent() {
+      const grid = document.getElementById('content-grid');
+      const search = document.getElementById('search').value.toLowerCase();
+      const filter = document.getElementById('filter').value;
+      grid.innerHTML = '';
+
+      const filteredUploads = uploads.filter(item =>
+        item.title.toLowerCase().includes(search) &&
+        (filter === 'all' || item.type === filter) &&
+        (activeTab === item.type || filter === item.type)
+      );
+
+      filteredUploads.forEach(item => {
+        const hasLiked = likedItems.includes(item.id);
+        const card = document.createElement('div');
+        card.className = 'content-card';
+        card.dataset.id = item.id;
+        card.innerHTML = `
+          <h3>${item.title}</h3>
+          <p class="meta">By Nexus | Views: ${item.views}</p>
+          ${item.type === 'music' ? `
+            <audio controls controlsList="nodownload" onplay="startViewCount(${item.id}, 'music')">
+              <source src="${item.file}" type="audio/mp3">
+              Your browser does not support the audio element.
+            </audio>
+          ` : `
+            <div class="post-text">${item.text}</div>
+          `}
+          <button class="delete-btn" onclick="openDeleteModal(${item.id})">Delete</button>
+          <div class="actions">
+            <button class="action-btn" onclick="like(${item.id})" ${hasLiked ? 'disabled' : ''}>
+              <span class="material-icons">thumb_up</span>
+              <span>${item.likes}</span>
+            </button>
+            <button class="action-btn">
+              <span class="material-icons">comment</span>
+              <span>${item.comments.length}</span>
+            </button>
+          </div>
+          <button class="comment-toggle" onclick="toggleComments(this)">More</button>
+          <div class="comments">
+            ${item.comments.map(comment => `<p>${comment}</p>`).join('')}
+            <input type="text" placeholder="Add a comment..." onkeypress="if(event.key === 'Enter') addComment(${item.id}, this)">
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+
+      document.getElementById('subscribers').textContent = subscribers;
+      document.getElementById('total-views').textContent = totalViews;
+      document.getElementById('monthly-views').textContent = monthlyViews;
+      document.getElementById('notification-count').textContent = notifications.length > 99 ? '99+' : notifications.length;
+      document.getElementById('subscribe-btn').disabled = hasSubscribed;
+      document.getElementById('unsubscribe-btn').disabled = !hasSubscribed;
+
+      const dropdown = document.getElementById('notification-dropdown');
+      dropdown.innerHTML = notifications.length > 0
+        ? notifications.map((note, index) => {
+            const match = note.match(/Nexus uploaded (.+) \((.+)\)/);
+            if (match) {
+              const title = match[1];
+              const type = match[2];
+              const upload = uploads.find(item => item.title === title && item.type === type);
+              if (upload) {
+                return `<p onclick="navigateToUpload(${upload.id}, '${type}')">${note}</p>`;
+              }
+            }
+            return `<p>${note}</p>`;
+          }).join('')
+        : '<p>No notifications</p>';
+      setupPostViewObserver();
+    }
+
+    function toggleNotifications() {
+      const dropdown = document.getElementById('notification-dropdown');
+      dropdown.classList.toggle('active');
+      if (dropdown.classList.contains('active')) {
+        notifications = [];
+        document.getElementById('notification-count').textContent = '0';
+        saveData();
+        renderContent();
+      }
+    }
+
+    function navigateToUpload(id, type) {
+      activeTab = type;
+      document.querySelectorAll('.tabs button').forEach(btn => btn.classList.remove('active'));
+      document.querySelector(`.tabs button[onclick="switchTab('${type}')"]`).classList.add('active');
+      renderContent();
+      const card = document.querySelector(`.content-card[data-id="${id}"]`);
+      if (card) {
+        card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      toggleNotifications();
+    }
+
+    function toggleComments(button) {
+      const comments = button.nextElementSibling;
+      comments.classList.toggle('active');
+      button.textContent = comments.classList.contains('active') ? 'Less' : 'More';
+    }
+
+    function switchTab(tab) {
+      activeTab = tab;
+      document.querySelectorAll('.tabs button').forEach(btn => btn.classList.remove('active'));
+      document.querySelector(`.tabs button[onclick="switchTab('${tab}')"]`).classList.add('active');
+      renderContent();
+    }
+
+    function openModal() {
+      document.getElementById('upload-modal').classList.add('active');
+      document.getElementById('upload-type').addEventListener('change', toggleUploadFields, { once: true });
+      toggleUploadFields();
+    }
+
+    function closeModal() {
+      document.getElementById('upload-modal').classList.remove('active');
+      document.getElementById('upload-title').value = '';
+      document.getElementById('upload-file').value = '';
+      document.getElementById('upload-text').value = '';
+      document.getElementById('upload-code').value = '';
+    }
+
+    function toggleUploadFields() {
+      const type = document.getElementById('upload-type').value;
+      document.getElementById('upload-file').style.display = type === 'music' ? 'block' : 'none';
+      document.getElementById('upload-text').style.display = type === 'post' ? 'block' : 'none';
+    }
+
+    function handleUpload() {
+      const title = document.getElementById('upload-title').value;
+      const type = document.getElementById('upload-type').value;
+      const file = document.getElementById('upload-file').files[0];
+      const text = document.getElementById('upload-text').value;
+      const code = document.getElementById('upload-code').value;
+
+      if (code !== correctCode) {
+        alert('Invalid code!');
+        return;
+      }
+
+      if (!title || (type === 'music' && !file) || (type === 'post' && !text)) {
+        alert('Please fill in all required fields.');
+        return;
+      }
+
+      const newUpload = {
+        id: uploads.length + 1,
+        title,
+        type,
+        file: type === 'music' ? URL.createObjectURL(file) : null,
+        text: type === 'post' ? text : null,
+        likes: 0,
+        comments: [],
+        views: 0
+      };
+
+      uploads.push(newUpload);
+      notifications.push(`Nexus uploaded ${title} (${type})`);
+      saveData();
+      closeModal();
+      renderContent();
+    }
+
+    function openDeleteModal(id) {
+      deletePostId = id;
+      document.getElementById('delete-modal').classList.add('active');
+      document.getElementById('delete-code').value = '';
+    }
+
+    function closeDeleteModal() {
+      document.getElementById('delete-modal').classList.remove('active');
+      deletePostId = null;
+    }
+
+    function confirmDelete() {
+      const code = document.getElementById('delete-code').value;
+      if (code !== correctCode) {
+        alert('Invalid code!');
+        return;
+      }
+
+      const deletedItem = uploads.find(item => item.id === deletePostId);
+      uploads = uploads.filter(item => item.id !== deletePostId);
+      likedItems = likedItems.filter(id => id !== deletePostId);
+      notifications.push(`Nexus deleted ${deletedItem.type} (ID: ${deletePostId})`);
+      saveData();
+      closeDeleteModal();
+      renderContent();
+    }
+
+    function like(id) {
+      if (!likedItems.includes(id)) {
+        uploads = uploads.map(item =>
+          item.id === id ? { ...item, likes: item.likes + 1 } : item
+        );
+        likedItems.push(id);
+        saveData();
+        renderContent();
+      }
+    }
+
+    function addComment(id, input) {
+      if (!input.value) return;
+      uploads = uploads.map(item =>
+        item.id === id ? { ...item, comments: [...item.comments, input.value] } : item
+      );
+      saveData();
+      input.value = '';
+      renderContent();
+    }
+
+    function subscribe() {
+      if (!hasSubscribed) {
+        subscribers += 1;
+        hasSubscribed = true;
+        saveData();
+        renderContent();
+      }
+    }
+
+    function unsubscribe() {
+      if (hasSubscribed) {
+        subscribers = Math.max(0, subscribers - 1);
+        hasSubscribed = false;
+        saveData();
+        renderContent();
+      }
+    }
+
+    function startViewCount(id, type) {
+      setTimeout(() => {
+        uploads = uploads.map(item => {
+          if (item.id === id) {
+            const newViews = item.views + 1;
+            totalViews += 1;
+            monthlyViews += 1;
+            return { ...item, views: newViews };
+          }
+          return item;
+        });
+        saveData();
+        renderContent();
+      }, 10000);
+    }
+
+    function setupPostViewObserver() {
+      const cards = document.querySelectorAll('.content-card');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && entry.target.dataset.id) {
+            const id = parseInt(entry.target.dataset.id);
+            const upload = uploads.find(item => item.id === id);
+            if (upload && upload.type === 'post') {
+              startViewCount(id, 'post');
+              observer.unobserve(entry.target);
+            }
+          }
+        });
+      }, { threshold: 0.5 });
+
+      cards.forEach(card => observer.observe(card));
+    }
+
+    document.getElementById('search').addEventListener('input', () => {
+      renderContent();
+      setupPostViewObserver();
+    });
+    document.getElementById('filter').addEventListener('change', () => {
+      renderContent();
+      setupPostViewObserver();
+    });
+
+    renderContent();
+    setupPostViewObserver();
+  </script>
+</body>
+</html>
