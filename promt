@@ -1,0 +1,175 @@
+Create a single-page web application called "Nexus Musik & Blog" using vanilla HTML, CSS, and JavaScript (no frameworks), styled in a futuristic Leonardo.ai aesthetic (purple-blue gradient background, neon-blue accents, rounded corners, modern Inter font). The app allows users to upload music (MP3/WAV) and blog posts, with responsive design for mobile and desktop. All data persists across browser sessions on the same device using localStorage. Below are the detailed requirements:
+
+### General Requirements:
+- **Platform Name**: "Nexus Musik & Blog", displayed as the main header in neon-blue (#00f2ff) with a glowing text-shadow.
+- **User Name**: Use "Nexus" for the channel name, content metadata ("By Nexus"), and notifications.
+- **Persistence**: Store all data (uploads, likes, comments, subscribers, views, notifications, subscription status, liked items) in localStorage to persist across browser sessions on the same device.
+- **Responsive Design**: Ensure mobile and desktop compatibility. On mobile (max-width: 768px), stack header controls, tabs, and content grid vertically.
+- **Styling**:
+  - Background: Linear gradient from purple (#2d1b4e) to blue (#1e3a8a).
+  - Cards and modals: Dark gray (#1f2937) with soft shadows (0 4px 20px rgba(0, 0, 0, 0.3)).
+  - Buttons: Neon-blue (#00f2ff) for primary actions, red (#ef4444) for delete/unsubscribe, gray (#4b5563) for cancel/disabled.
+  - Font: Inter (400, 600, 700 weights) from Google Fonts.
+  - Icons: Material Icons from Google Fonts (e.g., cloud_upload, notifications, thumb_up, comment).
+  - Rounded corners (8px border-radius) for buttons, cards, and modals.
+  - Hover effects: Scale cards up slightly, change button backgrounds (e.g., neon-blue to purple #6b46c1, red to darker red #dc2626).
+  - Smooth transitions (0.3s) for all hover and toggle effects.
+
+### UI Structure:
+1. **Header**:
+   - Left: Title "Nexus Musik & Blog" (h1, 2.5rem desktop, 2rem mobile).
+   - Right: Controls (flex, gap 15px, stacked on mobile):
+     - Search input (placeholder: "Search...", dark gray #1f2937, neon-blue focus ring).
+     - Filter dropdown (options: "All", "Music", "Posts", same styling as input).
+     - Upload button (cloud_upload icon, neon-blue circle, hover: purple #6b46c1).
+     - Notification button (notifications icon, neon-blue circle, hover: purple #6b46c1) with a red badge (#ef4444, circular, top-right, shows count or "99+" if >99).
+
+2. **Channel Info**:
+   - Card (dark gray #1f2937, rounded, padded 20px, shadow).
+   - Content:
+     - Name: "Nexus" (h2, 1.5rem).
+     - Subscribers: "Subscribers: 0" (p, 1rem, light gray #d1d5db).
+     - Total Views: "Total Views: 0" (p, 1rem, light gray #d1d5db).
+     - Monthly Views: "Monthly Views: 0" (p, 1rem, light gray #d1d5db).
+     - Subscribe button (neon-blue, text: "Subscribe", hover: purple #6b46c1, disabled: gray #4b5563).
+     - Unsubscribe button (red #ef4444, text: "Unsubscribe", hover: darker red #dc2626, disabled: gray #4b5563, initially disabled).
+   - Margin-bottom: 40px.
+
+3. **Tabs**:
+   - Flex container (gap 20px, stacked on mobile).
+   - Two buttons: "Music" (active by default) and "Posts" (dark gray #1f2937, white text, rounded, hover/active: neon-blue #00f2ff with dark text #1f2937).
+   - Margin-bottom: 40px.
+
+4. **Content Grid**:
+   - Grid layout (auto-fill, min 300px per column, gap 20px, single column on mobile).
+   - Each card (dark gray #1f2937, rounded, padded 20px, shadow, hover: scale up slightly):
+     - Title (h3, 1.25rem, white).
+     - Metadata: "By Nexus | Views: X" (0.875rem, light gray #d1d5db).
+     - Content:
+       - Music: Audio player (full width, controlsList="nodownload" to block downloads, source: file URL).
+       - Post: Scrollable text (1rem, light gray #d1d5db, max-height 300px, white-space: pre-wrap).
+     - Delete button (red #ef4444, text: "Delete", hover: darker red #dc2626, margin-top 10px).
+     - Actions (flex, gap 15px, margin-top 10px):
+       - Like button (neon-blue #00f2ff, thumb_up icon, shows like count, hover: purple #6b46c1, disabled: gray #4b5563).
+       - Comment button (neon-blue #00f2ff, comment icon, shows comment count, hover: purple #6b46c1).
+     - Comment toggle button (neon-blue #00f2ff, text: "More", hover: purple #6b46c1, margin-top 10px, toggles to "Less").
+     - Comments section (hidden by default, shown with "More", margin-top 10px):
+       - Comment list (p, 0.875rem, light gray #d1d5db, margin-bottom 5px).
+       - Input (full width, dark gray #374151, placeholder: "Add a comment...", neon-blue focus ring, margin-top 10px).
+
+5. **Modals**:
+   - **Upload Modal**:
+     - Trigger: Click upload button.
+     - Overlay: Semi-transparent black (rgba(0, 0, 0, 0.5)).
+     - Content (dark gray #1f2937, rounded, padded 20px, max-width 500px):
+       - Title: "Upload Content" (h2, 1.5rem).
+       - Dropdown: "Music" or "Post" (dark gray #374151, neon-blue focus ring).
+       - Title input (full width, dark gray #374151, placeholder: "Title").
+       - File input (for music, accept .mp3,.wav, hidden for posts).
+       - Textarea (for posts, min-height 100px, resize vertical, hidden for music).
+       - Code input (full width, dark gray #374151, placeholder: "Enter secure code").
+       - Buttons (flex, justify-end, gap 10px):
+         - Cancel (gray #4b5563, hover: darker gray #6b7280).
+         - Save (neon-blue #00f2ff, hover: purple #6b46c1).
+   - **Delete Modal**:
+     - Trigger: Click delete button on any music or post card.
+     - Overlay: Same as upload modal.
+     - Content (same styling as upload modal):
+       - Title: "Delete Content" (h2, 1.5rem).
+       - Text: "Enter the secure code to delete this content." (p).
+       - Code input (same as upload modal).
+       - Buttons (same as upload modal):
+         - Cancel (gray #4b5563, hover: darker gray #6b7280).
+         - Delete (neon-blue #00f2ff, hover: purple #6b46c1).
+
+### Functionality:
+1. **Uploads**:
+   - **Process**:
+     - Open upload modal, select type ("Music" or "Post"), enter title, upload file (music) or text (post), and enter secure code ("ShimaKing", defined in JavaScript, not shown in UI).
+     - Validate: Correct code, non-empty title, file for music, text for post. Show alerts for invalid code or missing fields.
+     - On save: Create new upload object (id: incremental, title, type, file URL or text, likes: 0, comments: [], views: 0), add to uploads array, push notification ("Nexus uploaded [title] ([type])"), save to localStorage, close modal, re-render content.
+   - **Display**:
+     - Show in content grid under correct tab ("Music" or "Posts").
+     - Metadata: "By Nexus | Views: 0".
+     - Music: Audio player with no download option.
+     - Post: Scrollable full text.
+
+2. **Deletion**:
+   - **Process**:
+     - Click "Delete" on any music or post card to open delete modal.
+     - Enter secure code ("ShimaKing"). Validate code; show alert if invalid.
+     - On confirm: Remove item from uploads array, remove from likedItems if present, add notification ("Nexus deleted [type] (ID: X)"), save to localStorage, close modal, re-render content.
+   - **Display**: Delete button on every card, red with hover effect.
+
+3. **Views**:
+   - **Music**: Increment views after 10 seconds of playback (use setTimeout).
+   - **Posts**: Increment views after 10 seconds of 50% visibility (use IntersectionObserver, unobserve after counting).
+   - **Counters**:
+     - Item views: Increment per item.
+     - Total Views: Sum of all item views.
+     - Monthly Views: Sum of all item views (no reset logic).
+   - Save all counters to localStorage, initialize at 0.
+
+4. **Likes**:
+   - Allow one like per item per device (track in likedItems array in localStorage).
+   - On click: Increment item’s likes, add ID to likedItems, disable like button (gray #4b5563), save to localStorage, re-render.
+   - Display: Show like count next to thumb_up icon.
+
+5. **Comments**:
+   - Hidden by default, toggled with "More" button (changes to "Less").
+   - Input: Add comment on Enter key (non-empty), append to item’s comments array, save to localStorage, clear input, re-render.
+   - Display: List comments (0.875rem, light gray), input below when visible.
+
+6. **Subscriptions**:
+   - **Subscribe**: Allow once per device (track hasSubscribed in localStorage). Increment subscribers, set hasSubscribed to true, disable subscribe button, enable unsubscribe button, save to localStorage, re-render.
+   - **Unsubscribe**: Allow once after subscribing. Decrement subscribers (minimum 0), set hasSubscribed to false, disable unsubscribe button, enable subscribe button, save to localStorage, re-render.
+   - Initialize subscribers at 0.
+
+7. **Notifications**:
+   - **Display**:
+     - Bell icon with badge showing count (or "99+" if >99).
+     - Click bell to show/hide dropdown (dark gray #1f2937, max-height 300px, scrollable, right-aligned, z-index 10).
+     - Dropdown lists notifications (0.875rem, light gray #d1d5db, hover: darker gray #374151).
+   - **Content**:
+     - Upload: "Nexus uploaded [title] ([type])", clickable to switch to correct tab and scroll to content (smooth scroll).
+     - Deletion: "Nexus deleted [type] (ID: X)", not clickable.
+   - **Reset**:
+     - On bell click, clear notifications array, set badge to 0, save to localStorage, re-render dropdown as "No notifications".
+     - New uploads or deletions add notifications, incrementing count.
+
+8. **Search and Filter**:
+   - **Search**: Filter uploads by title (case-insensitive, partial match).
+   - **Filter**: Dropdown ("All", "Music", "Posts") filters by type. Show items matching active tab or filter type.
+   - Update content grid on input/change, reapply post view observer.
+
+### Technical Details:
+- **localStorage**:
+  - Store: uploads (array of objects), subscribers (number), totalViews (number), monthlyViews (number), notifications (array of strings), likedItems (array of IDs), hasSubscribed (boolean).
+  - Load on page load, initialize empty/0/false if unset.
+  - Save after every action (upload, delete, like, comment, subscribe, unsubscribe, view, notification reset).
+- **JavaScript**:
+  - Use vanilla JavaScript, no frameworks.
+  - Secure code: Define "ShimaKing" in JavaScript, not UI. Use placeholder "Enter secure code" for inputs.
+  - Audio: Use URL.createObjectURL for music files, revoke not needed due to localStorage.
+  - Scroll: Use scrollIntoView with smooth behavior for notification navigation.
+  - Comments: Toggle visibility with CSS display (none/block), track state with "active" class.
+- **CSS**:
+  - Use flex and grid for layout.
+  - Mobile: Stack header controls, tabs, and grid at max-width 768px.
+  - Modals: Fixed position, centered, semi-transparent overlay, max-width 500px.
+  - Badge: Absolute position, circular, red #ef4444, 20x20px, centered text.
+- **Limitations**:
+  - localStorage: ~5-10MB limit, large music files may cause issues.
+  - Audio: controlsList="nodownload" may not work in all browsers.
+  - Code security: Visible in JavaScript source; backend needed for true security.
+  - Cross-device syncing: Not implemented, requires backend.
+
+### Implementation Notes:
+- Initialize content grid with no uploads.
+- Render content on page load, search input, filter change, and all actions.
+- Use IntersectionObserver for post views (threshold 0.5, unobserve after count).
+- Cap notification badge at "99+" for display.
+- Ensure all buttons have hover effects unless disabled.
+- Test all interactions (upload, delete, like, comment, subscribe/unsubscribe, notification click/reset) and persistence across browser refresh.
+
+This prompt ensures a 1:1 recreation of the "Nexus Musik & Blog" web app as implemented.
